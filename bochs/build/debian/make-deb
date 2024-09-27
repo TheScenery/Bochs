@@ -1,0 +1,50 @@
+#!/bin/bash -x
+#########################################################################
+# $Id$
+#########################################################################
+# build/debian/make-deb
+#
+# This script creates an DEB from the bochs directory.  You must run 
+# it as root from the top of the source directory (where the configure
+# scripts are).  Then just run:
+#    ./build/debian/make-deb
+#
+#########################################################################
+
+CAT=cat
+RM=rm
+CP=cp
+MV=mv
+MKDIR=mkdir
+GREP=grep
+ECHO=echo
+DEB=deb
+SED=sed
+TAR=tar
+DEBROOTPATH=build_rootpath/_deb_top
+DEBIANPATH=${DEBROOTPATH}/DEBIAN
+DEBBINPATH=${DEBROOTPATH}/usr/local/bin
+DEBSHAREPATH=${DEBROOTPATH}/usr/local/share
+CONTROLTEMPLATE="build/debian/bochs.control.template"
+TMPDIR=/tmp
+
+# clean up previous rpm builds
+${RM} -rf *.deb ${DEBROOTPATH}
+if test -f Makefile; then
+  make dist-clean
+fi
+
+build bochs
+./configure --enable-debugger --enable-debugger-gui --enable-x86-debugger
+make
+
+# create build directory
+${MKDIR} -p ${DEBIANPATH}
+
+# generate control file
+${CAT} ${CONTROLTEMPLATE} > ${DEBIANPATH}/control
+
+# copy artifacts
+${MKDIR} -p ${DEBBINPATH}
+${CP} -p bochs ${DEBBINPATH}
+${CP} -p bximage ${DEBBINPATH}

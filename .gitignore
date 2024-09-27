@@ -9,6 +9,7 @@ obj-debug/
 obj-release/
 .vscode
 bochs-msvc-src.zip
+build_rootpath/
 
 # /bochs/
 /bochs/Makefile
