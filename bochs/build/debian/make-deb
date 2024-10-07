@@ -4,7 +4,7 @@
 #########################################################################
 # build/debian/make-deb
 #
-# This script creates an DEB from the bochs directory.  You must run 
+# This script creates an DEB from the bochs directory.  You must run
 # it as root from the top of the source directory (where the configure
 # scripts are).  Then just run:
 #    ./build/debian/make-deb
@@ -21,14 +21,38 @@ ECHO=echo
 DEB=deb
 SED=sed
 TAR=tar
+
+prefix=/usr/local
+exec_prefix=${prefix}
+srcdir=.
+
+bindir=${exec_prefix}/bin
+libdir=${exec_prefix}/lib
+plugdir=${exec_prefix}/lib/bochs/plugins
+datarootdir=${prefix}/share
+mandir=${datarootdir}/man
+man1dir=$(mandir)/man1
+man5dir=$(mandir)/man5
+docdir=$(datarootdir)/doc/bochs
+sharedir=$(datarootdir)/bochs
+top_builddir=.
+top_srcdir=$(srcdir)
+
 DEBROOTPATH=build_rootpath/_deb_top
+DESTDIR=${DEBROOTPATH}
 DEBIANPATH=${DEBROOTPATH}/DEBIAN
-DEBBINPATH=${DEBROOTPATH}/usr/local/bin
-DEBSHAREPATH=${DEBROOTPATH}/usr/local/share
+DEBBINPATH=${DEBROOTPATH}${bindir}
+DEBSHAREPATH=${DEBROOTPATH}${sharedir}
 CONTROLTEMPLATE="build/debian/bochs.control.template"
 TMPDIR=/tmp
+MAN_PAGE_1_LIST=(bochs bximage bochs-dlx)
+MAN_PAGE_5_LIST=(bochsrc)
+INSTALL_LIST_SHARE=(bios/BIOS-bochs-* bios/VGABIOS* bios/SeaBIOS* bios/SeaVGABIOS* bios/bios.bin-* bios/vgabios-cirrus.bin-*)
+INSTALL_LIST_DOC=(CHANGES COPYING LICENSE README TODO misc/slirp.conf misc/vnet.conf)
+INSTALL_LIST_BIN=(bochs bximage)
+INSTALL_LIST_BIN_OPTIONAL=(bochsdbg)
 
-# clean up previous rpm builds
+clean up previous rpm builds
 ${RM} -rf *.deb ${DEBROOTPATH}
 if test -f Makefile; then
   make dist-clean
@@ -42,9 +66,11 @@ make
 ${MKDIR} -p ${DEBIANPATH}
 
 # generate control file
-${CAT} ${CONTROLTEMPLATE} > ${DEBIANPATH}/control
+${CAT} ${CONTROLTEMPLATE} >${DEBIANPATH}/control
 
 # copy artifacts
-${MKDIR} -p ${DEBBINPATH}
-${CP} -p bochs ${DEBBINPATH}
-${CP} -p bximage ${DEBBINPATH}
+
+# copy bin
+for i in ${DESTDIR}${bindir}; do mkdir -p $i && test -d $i && test -w $i; done
+for i in ${INSTALL_LIST_BIN[@]}; do ${CP} $i ${DESTDIR}${bindir}; done
+for i in ${INSTALL_LIST_BIN_OPTIONAL[@]}; do if test -f $i; then ${CP} $i ${DESTDIR}${bindir}; fi; done
