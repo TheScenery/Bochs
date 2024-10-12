@@ -16,27 +16,33 @@ RM=rm
 CP=cp
 MV=mv
 MKDIR=mkdir
+CAT=cat
 GREP=grep
 ECHO=echo
 DEB=deb
 SED=sed
 TAR=tar
+GZIP_BIN=gzip
+CHMOD=chmod
+INSTALL=install
 
 prefix=/usr/local
 exec_prefix=${prefix}
 srcdir=.
+
+VERSION=$(${CAT} Makefile | ${GREP} -P -o '(?<=VERSION=).+')
 
 bindir=${exec_prefix}/bin
 libdir=${exec_prefix}/lib
 plugdir=${exec_prefix}/lib/bochs/plugins
 datarootdir=${prefix}/share
 mandir=${datarootdir}/man
-man1dir=$(mandir)/man1
-man5dir=$(mandir)/man5
-docdir=$(datarootdir)/doc/bochs
-sharedir=$(datarootdir)/bochs
+man1dir=${mandir}/man1
+man5dir=${mandir}/man5
+docdir=${datarootdir}/doc/bochs
+sharedir=${datarootdir}/bochs
 top_builddir=.
-top_srcdir=$(srcdir)
+top_srcdir=${srcdir}
 
 DEBROOTPATH=build_rootpath/_deb_top
 DESTDIR=${DEBROOTPATH}
@@ -68,9 +74,47 @@ ${MKDIR} -p ${DEBIANPATH}
 # generate control file
 ${CAT} ${CONTROLTEMPLATE} >${DEBIANPATH}/control
 
-# copy artifacts
 
+# copy artifacts
 # copy bin
 for i in ${DESTDIR}${bindir}; do mkdir -p $i && test -d $i && test -w $i; done
-for i in ${INSTALL_LIST_BIN[@]}; do ${CP} $i ${DESTDIR}${bindir}; done
-for i in ${INSTALL_LIST_BIN_OPTIONAL[@]}; do if test -f $i; then ${CP} $i ${DESTDIR}${bindir}; fi; done
+for i in ${INSTALL_LIST_BIN[@]}; do ${INSTALL} $i ${DESTDIR}${bindir}; done
+for i in ${INSTALL_LIST_BIN_OPTIONAL[@]}; do if test -f $i; then ${INSTALL} $i ${DESTDIR}${bindir}; fi; done
+
+# copy man
+${MKDIR} -p ${DESTDIR}${man1dir}
+${MKDIR} -p ${DESTDIR}${man5dir}
+
+for i in ${MAN_PAGE_1_LIST[@]}
+do
+${CAT} ${srcdir}/doc/man/$i.1 | ${SED} "s/@version@/${VERSION}/g" | ${GZIP_BIN} -c > ${DESTDIR}${man1dir}/$i.1.gz
+${CHMOD} 644 ${DESTDIR}${man1dir}/$i.1.gz
+done
+
+for i in ${MAN_PAGE_5_LIST[@]}
+do
+${CAT} ${srcdir}/doc/man/$i.5 | ${GZIP_BIN} -9 -c > ${DESTDIR}${man1dir}/$i.5.gz
+${CHMOD} 644 ${DESTDIR}${man1dir}/$i.5.gz
+done
+
+# copy share
+for i in ${DESTDIR}${sharedir}; do mkdir -p $i && test -d $i && test -w $i; done
+for i in ${INSTALL_LIST_SHARE[@]}
+do
+${INSTALL} -m 644 $i ${DESTDIR}${sharedir}
+done
+${MKDIR} ${DESTDIR}${sharedir}/keymaps
+for i in ${srcdir}/gui/keymaps/*.map
+do
+${INSTALL} -m 644 $i ${DESTDIR}${sharedir}/keymaps
+done
+
+# copy doc
+for i in ${DESTDIR}${docdir}; do mkdir -p $i && test -d $i && test -w $i; done
+for i in ${INSTALL_LIST_DOC[@]}
+do
+${INSTALL} -m 644 $i ${DESTDIR}${docdir}
+done
+${RM} -f ${DESTDIR}${docdir}/README
+${CAT} ${srcdir}/build/linux/README.linux-binary ${srcdir}/README > ${DESTDIR}${docdir}/README
+${INSTALL} -m 644 ${srcdir}/.bochsrc ${DESTDIR}${docdir}/bochsrc-sample.txt
