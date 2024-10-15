@@ -120,4 +120,4 @@ ${CAT} ${srcdir}/build/linux/README.linux-binary ${srcdir}/README > ${DESTDIR}${
 ${INSTALL} -m 644 ${srcdir}/.bochsrc ${DESTDIR}${docdir}/bochsrc-sample.txt
 
 # generate deb file
-dpkg -b ${DESTDIR} bochs-debug_2.8.devel_all.deb
+dpkg -b ${DESTDIR} bochs-debug_${VERSION}_all.deb
