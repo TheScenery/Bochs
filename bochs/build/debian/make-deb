@@ -58,7 +58,7 @@ INSTALL_LIST_DOC=(CHANGES COPYING LICENSE README TODO misc/slirp.conf misc/vnet.
 INSTALL_LIST_BIN=(bochs bximage)
 INSTALL_LIST_BIN_OPTIONAL=(bochsdbg)
 
-clean up previous rpm builds
+# clean up previous deb builds
 ${RM} -rf *.deb ${DEBROOTPATH}
 if test -f Makefile; then
   make dist-clean
@@ -118,3 +118,6 @@ done
 ${RM} -f ${DESTDIR}${docdir}/README
 ${CAT} ${srcdir}/build/linux/README.linux-binary ${srcdir}/README > ${DESTDIR}${docdir}/README
 ${INSTALL} -m 644 ${srcdir}/.bochsrc ${DESTDIR}${docdir}/bochsrc-sample.txt
+
+# generate deb file
+dpkg -b ${DESTDIR} bochs-debug_2.8.devel_all.deb
