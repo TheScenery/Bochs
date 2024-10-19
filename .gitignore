@@ -9,7 +9,6 @@ obj-debug/
 obj-release/
 .vscode
 bochs-msvc-src.zip
-build_rootpath/
 
 # /bochs/
 /bochs/Makefile
@@ -35,7 +34,6 @@ build_rootpath/
 /bochs/libtool
 /bochs/.bochs.out
 /bochs/vs2019
-/bochs/*.deb
 
 # /bochs/bios/
 /bochs/bios/Makefile
