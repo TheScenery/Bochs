@@ -1,3 +1,5 @@
+# Make a deb package with gui-debugger enabled
+
 # Welcome to the Bochs IA-32 Emulator Project
 
 Bochs is a portable IA-32 (x86) PC emulator written in C++,
