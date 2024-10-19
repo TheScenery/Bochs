@@ -17,8 +17,11 @@ jobs:
     - name: create sources tarball
       run: tar czvf bochs.tar.gz --exclude=.git bochs
 
-    - name: build linux binaries
+    - name: build linux redhat binaries
       run: cd bochs && ./build/redhat/make-rpm | tee ../build.log
+
+    - name: build linux debian binaries
+      run: cd bochs && ./build/debian/make-deb | tee ../build.log
 
     - name: Upload release sources tarball
       uses: actions/upload-artifact@v4
@@ -31,3 +34,9 @@ jobs:
       with:
         name: bochs linux RPM
         path: bochs/bochs-*.rpm
+
+    - name: Upload release linux DEB package
+      uses: actions/upload-artifact@v4
+      with:
+        name: bochs linux DEB
+        path: bochs/bochs-*.deb
