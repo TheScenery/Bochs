@@ -38,5 +38,5 @@ jobs:
     - name: Upload release linux DEB package
       uses: actions/upload-artifact@v4
       with:
-        name: bochs linux DEB
+        name: bochs-linux-DEB
         path: bochs/bochs-*.deb
