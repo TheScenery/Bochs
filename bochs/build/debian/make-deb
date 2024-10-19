@@ -25,6 +25,8 @@ TAR=tar
 GZIP_BIN=gzip
 CHMOD=chmod
 INSTALL=install
+CHOWN=chown
+CHGRP=chgrp
 
 prefix=/usr/local
 exec_prefix=${prefix}
@@ -119,5 +121,8 @@ ${RM} -f ${DESTDIR}${docdir}/README
 ${CAT} ${srcdir}/build/linux/README.linux-binary ${srcdir}/README > ${DESTDIR}${docdir}/README
 ${INSTALL} -m 644 ${srcdir}/.bochsrc ${DESTDIR}${docdir}/bochsrc-sample.txt
 
+# change owner and group to root
+${CHOWN} -R root ${DESTDIR}
+${CHGRP} -R root ${DESTDIR}
 # generate deb file
 dpkg -b ${DESTDIR} bochs-debug_${VERSION}_all.deb
