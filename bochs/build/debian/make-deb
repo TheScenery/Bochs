@@ -32,8 +32,6 @@ prefix=/usr/local
 exec_prefix=${prefix}
 srcdir=.
 
-VERSION=$(${CAT} Makefile | ${GREP} -P -o '(?<=VERSION=).+')
-
 bindir=${exec_prefix}/bin
 libdir=${exec_prefix}/lib
 plugdir=${exec_prefix}/lib/bochs/plugins
@@ -66,15 +64,19 @@ if test -f Makefile; then
   make dist-clean
 fi
 
-build bochs
+# build bochs
 ./configure --enable-debugger --enable-debugger-gui --enable-x86-debugger
+
+VERSION=$(${CAT} Makefile | ${GREP} -P -o '(?<=VERSION=).+')
+echo "make deb package for version ${VERSION}"
+
 make
 
 # create build directory
 ${MKDIR} -p ${DEBIANPATH}
 
 # generate control file
-${CAT} ${CONTROLTEMPLATE} >${DEBIANPATH}/control
+${CAT} ${CONTROLTEMPLATE} | ${SED} "s/@version@/${VERSION}/g" > ${DEBIANPATH}/control
 
 
 # copy artifacts
